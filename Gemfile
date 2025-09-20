@@ -43,3 +43,5 @@ group :development, :test do
 
   gem "dotenv-rails", require: "dotenv/load"
 end
+
+gem "devise", "~> 4.9"
