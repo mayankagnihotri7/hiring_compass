@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
@@ -41,4 +43,3 @@ group :development, :test do
 
   gem "dotenv-rails", require: "dotenv/load"
 end
-
