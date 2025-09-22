@@ -29,14 +29,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_091120) do
     t.string "unconfirmed_email"
     t.string "first_name", null: false
     t.string "last_name", null: false
+    t.string "nickname"
+    t.string "email"
     t.string "phone_number", null: false
     t.string "bio"
     t.string "address"
     t.string "role", default: "recruiter", null: false
-    t.string "name"
-    t.string "nickname"
-    t.string "image"
-    t.string "email"
     t.json "tokens"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
