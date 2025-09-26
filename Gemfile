@@ -43,3 +43,7 @@ group :development, :test do
 
   gem "dotenv-rails", require: "dotenv/load"
 end
+
+gem "devise", "~> 4.9"
+gem "devise_token_auth"
+gem "phonelib"
