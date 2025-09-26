@@ -15,7 +15,6 @@ class User < ActiveRecord::Base
   validates :address, length: { maximum: 255 }, allow_blank: true
   validates :phone_number, phone: true, presence: true
 
-  before_validation :normalize_phone_number
   before_save :normalize_phone_number
 
   def full_name
