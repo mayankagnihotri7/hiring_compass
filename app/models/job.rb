@@ -3,7 +3,7 @@
 class Job < ApplicationRecord
   enum status: %w[open closed paused].index_by(&:itself)
 
-  validates :title, :status, presence: true
+  validates :title, :status, :currency, presence: true
   validates :min_salary, :max_salary, numericality: { greater_than: 0 }
 
   validate :max_salary_not_less_than_min_salary
