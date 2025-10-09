@@ -38,14 +38,14 @@ group :development, :test do
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
 
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase", require: false
-
   gem "dotenv-rails", require: "dotenv/load"
-
+  gem "factory_bot_rails"
+  gem "faker"
   gem "rspec-rails", "~> 8.0.0"
 
-  gem "faker"
+  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  gem "rubocop-rails-omakase", require: false
+  gem "shoulda-matchers"
 end
 
 gem "devise", "~> 4.9"

@@ -107,6 +107,11 @@ GEM
     drb (2.2.3)
     erb (5.0.2)
     erubi (1.13.1)
+    factory_bot (6.5.1)
+      activesupport (>= 6.1.0)
+    factory_bot_rails (6.4.2)
+      factory_bot (~> 6.4)
+      railties (>= 5.0.0)
     faker (3.5.2)
       i18n (>= 1.8.11, < 2)
     globalid (1.2.1)
@@ -278,6 +283,8 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    shoulda-matchers (5.3.0)
+      activesupport (>= 5.2.0)
     stringio (3.1.7)
     thor (1.4.0)
     timeout (0.4.3)
@@ -314,6 +321,7 @@ DEPENDENCIES
   devise (~> 4.9)
   devise_token_auth
   dotenv-rails
+  factory_bot_rails
   faker
   pg (~> 1.1)
   phonelib
@@ -321,6 +329,7 @@ DEPENDENCIES
   rails (~> 7.2.2, >= 7.2.2.2)
   rspec-rails (~> 8.0.0)
   rubocop-rails-omakase
+  shoulda-matchers
   tzinfo-data
 
 BUNDLED WITH
