@@ -1,0 +1,51 @@
+# frozen_string_literal: true
+
+module Api
+  module V1
+    class JobsController < ApplicationController
+      before_action :set_job, only: %i[update show destory]
+      def index
+        jobs = Job.all
+        render json: jobs
+      end
+
+      def create
+        job = Job.new(job_params)
+
+        if job.save
+          render json: job, status: :created
+        else
+          render json: { errors: job.errors.full_message }, status: :unprocessable_entity
+        end
+      end
+
+      def show
+        render json: @job
+      end
+
+      def update
+        if @job.update(job_params)
+          render json: @job
+        else
+          render json: { errors: @job.errors.full_message }, status: :unprocessable_entity
+        end
+      end
+
+      def destroy
+        @job.destroy
+
+        head :no_content
+      end
+
+      private
+
+        def set_job
+          @job = Job.find(params[:id])
+        end
+
+        def job_params
+          params.require(:job).permit(:title, :status, :currency, :min_salary, :max_salary)
+        end
+    end
+  end
+end
