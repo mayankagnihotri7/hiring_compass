@@ -3,7 +3,9 @@
 module Api
   module V1
     class JobsController < ApplicationController
+      before_action :authenticate_user!, only: %i[update destroy create]
       before_action :set_job, only: %i[update show destory]
+
       def index
         jobs = Job.all
         render json: jobs
@@ -15,7 +17,7 @@ module Api
         if job.save
           render json: job, status: :created
         else
-          render json: { errors: job.errors.full_message }, status: :unprocessable_entity
+          render json: { errors: job.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -27,7 +29,7 @@ module Api
         if @job.update(job_params)
           render json: @job
         else
-          render json: { errors: @job.errors.full_message }, status: :unprocessable_entity
+          render json: { errors: @job.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
