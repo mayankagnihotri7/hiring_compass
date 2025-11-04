@@ -53,4 +53,29 @@ RSpec.describe "Api::V1::Jobs", type: :request do
       end
     end
   end
+
+  describe "#index" do
+    let!(:user_two) { create(:user) }
+    let!(:job_one) { create(:job, user:) }
+    let!(:job_two) { create(:job, user:) }
+    let!(:job_three) { create(:job, user: user_two) }
+
+    context "when user id is passed" do
+
+      it "fetches jobs for the user" do
+        send_request :get, api_v1_jobs_path(user_id: user.id), headers: auth_headers(user)
+
+        expect(json_response.count).to eq(2)
+        expect(job_three.user_id).not_to eq(user.id)
+      end
+    end
+
+    context "when user id is not passed" do
+      it "fetches all jobs" do
+        send_request :get, api_v1_jobs_path, headers: auth_headers(user)
+
+        expect(json_response.count).to eq(3)
+      end
+    end
+  end
 end
