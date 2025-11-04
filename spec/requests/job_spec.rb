@@ -108,7 +108,9 @@ RSpec.describe "Api::V1::Jobs", type: :request do
 
     context "when valid id given" do
       it "removes job" do
-        send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user)
+        expect {
+          send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user)
+        }.to change(Job, :count).by(-1)
 
         expect(response).to have_http_status(:no_content)
         expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
