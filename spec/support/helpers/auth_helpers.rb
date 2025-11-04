@@ -25,7 +25,7 @@ module AuthHelpers
     when :patch
       put url, headers:, params:
     when :delete
-      put url, headers:, params:
+      delete url, headers:, params:
     end
   end
 end
