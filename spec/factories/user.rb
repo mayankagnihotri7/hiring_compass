@@ -5,7 +5,7 @@ FactoryBot.define do
     email { Faker::Internet.email }
     bio { Faker::Lorem.paragraph(sentence_count: 2) }
     address { Faker::Address.full_address }
-    phone_number { Faker::PhoneNumber.phone_number_with_country_code }
+    phone_number { "+91 1234567890" }
     password { "password" }
 
     trait :admin do

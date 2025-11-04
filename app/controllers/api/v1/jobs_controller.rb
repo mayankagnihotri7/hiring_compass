@@ -4,18 +4,18 @@ module Api
   module V1
     class JobsController < ApplicationController
       before_action :authenticate_user!, only: %i[update destroy create]
-      before_action :set_job, only: %i[update show destory]
+      before_action :set_job, only: %i[update show destroy]
 
       def index
-        jobs = Job.all
+        jobs = params[:user_id].present? ? Job.where(user_id: params[:user_id]) : Job.all
         render json: jobs
       end
 
       def create
-        job = Job.new(job_params)
+        job = current_user.jobs.build(job_params)
 
         if job.save
-          render json: job, status: :created
+          render json: job, status: :ok
         else
           render json: { errors: job.errors.full_messages }, status: :unprocessable_entity
         end
@@ -46,7 +46,7 @@ module Api
         end
 
         def job_params
-          params.require(:job).permit(:title, :status, :currency, :min_salary, :max_salary)
+          params.require(:job).permit(:title, :status, :currency, :min_salary, :max_salary, :description)
         end
     end
   end
