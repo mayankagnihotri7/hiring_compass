@@ -103,6 +103,26 @@ RSpec.describe "Api::V1::Jobs", type: :request do
     end
   end
 
+  describe "#show" do
+    let!(:job) { create(:job) }
+
+    context "when valid id is given" do
+      it "fetches job" do
+        send_request :get, api_v1_job_path(id: job.id), headers: auth_headers(user)
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "when invalid id is given" do
+      it "gives error" do
+        send_request :get, api_v1_job_path(id: "123"), headers: auth_headers(user)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe "#destroy" do
     let!(:job) { create(:job, user:) }
 
