@@ -6,5 +6,6 @@ FactoryBot.define do
     min_salary { 5000 }
     max_salary { 10000 }
     association :user
+    description { Faker::Lorem.paragraph(sentence_count: 2) }
   end
 end

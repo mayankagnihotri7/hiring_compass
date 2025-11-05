@@ -10,6 +10,8 @@ class User < ActiveRecord::Base
 
   enum role: %w[recruiter admin].index_by(&:itself)
 
+  has_many :jobs
+
   validates :first_name, :last_name, presence: true, format: { with: /\A[a-zA-Z\s]+\z/ }, length: { maximum: 20 }
   validates :bio, length: { maximum: 500 }, allow_blank: true
   validates :address, length: { maximum: 255 }, allow_blank: true
