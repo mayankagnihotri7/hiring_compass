@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateJobTechnologies < ActiveRecord::Migration[7.2]
   def change
     create_table :job_technologies, id: :uuid do |t|
