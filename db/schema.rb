@@ -18,7 +18,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_05_140713) do
   create_table "job_technologies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "job_id", null: false
     t.uuid "technology_id", null: false
-    t.integer "years_of_experience", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["job_id", "technology_id"], name: "index_job_technologies_on_job_id_and_technology_id", unique: true
@@ -35,6 +34,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_05_140713) do
     t.integer "min_salary"
     t.integer "max_salary"
     t.string "currency", default: "USD", null: false
+    t.integer "years_of_experience", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_jobs_on_user_id"

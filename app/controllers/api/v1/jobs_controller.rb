@@ -12,9 +12,9 @@ module Api
       end
 
       def create
-        job = current_user.jobs.build(job_params)
+        job = Jobs::SaveService.new(current_user, job_params).call
 
-        if job.save
+        if job.persisted?
           render json: job, status: :ok
         else
           render json: { errors: job.errors.full_messages }, status: :unprocessable_entity
@@ -46,7 +46,10 @@ module Api
         end
 
         def job_params
-          params.require(:job).permit(:title, :status, :currency, :min_salary, :max_salary, :description)
+          params.require(:job).permit(
+            :title, :status, :currency, :min_salary, :max_salary, :description,
+            technologies: [:id, :name]
+          )
         end
     end
   end

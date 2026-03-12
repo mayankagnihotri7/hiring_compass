@@ -5,8 +5,12 @@ class Job < ApplicationRecord
 
   validates :title, :status, :currency, presence: true
   validates :min_salary, :max_salary, numericality: { greater_than: 0 }
+  validates :years_of_experience, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validate :max_salary_not_less_than_min_salary
+
+  has_many :job_technologies
+  has_many :technologies, through: :job_technologies
 
   belongs_to :user
 
