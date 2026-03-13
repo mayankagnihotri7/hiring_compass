@@ -7,5 +7,6 @@ FactoryBot.define do
     max_salary { 10000 }
     association :user
     description { Faker::Lorem.paragraph(sentence_count: 2) }
+    category { "sales" }
   end
 end

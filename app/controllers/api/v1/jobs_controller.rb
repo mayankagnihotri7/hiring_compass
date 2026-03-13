@@ -39,6 +39,10 @@ module Api
         head :no_content
       end
 
+      def categories
+        render json: { categories: Job.categories.keys }
+      end
+
       private
 
         def set_job
@@ -47,7 +51,7 @@ module Api
 
         def job_params
           params.require(:job).permit(
-            :title, :status, :currency, :min_salary, :max_salary, :description,
+            :title, :status, :currency, :min_salary, :max_salary, :description, :category,
             technologies: [:id, :name]
           )
         end
