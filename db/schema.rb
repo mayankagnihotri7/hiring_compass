@@ -35,6 +35,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_05_140713) do
     t.integer "max_salary"
     t.string "currency", default: "USD", null: false
     t.integer "years_of_experience", default: 0, null: false
+    t.string "category", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_jobs_on_user_id"

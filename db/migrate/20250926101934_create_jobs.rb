@@ -12,6 +12,7 @@ class CreateJobs < ActiveRecord::Migration[7.2]
       t.integer :max_salary
       t.string :currency, null: false, default: "USD"
       t.integer :years_of_experience, null: false, default: 0
+      t.string :category, null: false
 
       t.timestamps
     end
