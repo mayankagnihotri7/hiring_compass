@@ -28,6 +28,7 @@ class Job < ApplicationRecord
 
     def tech_job_must_have_technologies
       return unless category == "tech"
+      return if technologies.any?
 
       errors.add(:technologies, "must be present for tech jobs")
     end

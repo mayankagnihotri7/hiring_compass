@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :technology do
-    name { "MyString" }
+    name { Faker::Lorem.word.capitalize }
   end
 end

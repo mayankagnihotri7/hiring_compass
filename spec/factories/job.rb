@@ -8,5 +8,13 @@ FactoryBot.define do
     association :user
     description { Faker::Lorem.paragraph(sentence_count: 2) }
     category { "sales" }
+
+    trait :with_technology do
+      category { "tech" }
+
+      after(:build) do |job|
+        job.technologies << FactoryBot.build(:technology)
+      end
+    end
   end
 end
