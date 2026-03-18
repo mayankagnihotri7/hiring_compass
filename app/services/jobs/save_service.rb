@@ -42,7 +42,7 @@ module Jobs
 
       def handle_error(error)
         @job ||= user.jobs.build(job_attrs)
-        @job.errors.add(:base, e.message)
+        @job.errors.add(:base, error.message)
         @job
       end
   end

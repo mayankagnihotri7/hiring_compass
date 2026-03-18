@@ -26,7 +26,9 @@ module Api
       end
 
       def update
-        if @job.update(job_params)
+        Jobs::SaveService.new(current_user, job_params, @job).call
+
+        if @job.errors.empty?
           render json: @job
         else
           render json: { errors: @job.errors.full_messages }, status: :unprocessable_entity
