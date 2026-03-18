@@ -7,8 +7,14 @@ module Api
       before_action :set_job, only: %i[update show destroy]
 
       def index
-        jobs = params[:user_id].present? ? Job.where(user_id: params[:user_id]) : Job.all
-        render json: jobs
+        # rubocop:disable Layout/IndentationWidth
+        # rubocop:disable Layout/EndAlignment
+        jobs = if params[:user_id].present?
+                 Job.includes(:technologies).where(user_id: params[:user_id])
+               else
+                 Job.includes(:technologies).all
+               end
+        render json: jobs.as_json(include: :technologies)
       end
 
       def create
@@ -22,7 +28,7 @@ module Api
       end
 
       def show
-        render json: @job
+        render json: @job.as_json(include: :technologies)
       end
 
       def update
@@ -53,7 +59,8 @@ module Api
 
         def job_params
           params.require(:job).permit(
-            :title, :status, :currency, :min_salary, :max_salary, :description, :category,
+            :title, :status, :currency, :min_salary, :max_salary, :description, :category, :location,
+            :years_of_experience,
             technologies: [:id, :name]
           )
         end

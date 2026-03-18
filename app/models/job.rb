@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Job < ApplicationRecord
-  enum status: %w[open closed paused].index_by(&:itself)
-  enum category: %w[tech sales marketing design product finance operations].index_by(&:itself)
+  enum :status, %w[open closed paused].index_by(&:itself)
+  enum :category, %w[tech sales marketing design product finance operations].index_by(&:itself)
 
   validates :title, :status, :currency, :category, presence: true
   validates :min_salary, :max_salary, numericality: { greater_than: 0 }
