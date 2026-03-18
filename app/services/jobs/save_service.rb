@@ -14,14 +14,14 @@ module Jobs
       ActiveRecord::Base.transaction do
         @job ||= user.jobs.new
         @job.assign_attributes(job_attrs)
-        @job.save!
         @job.technologies = resolve_technologies if params[:technologies].present?
+        @job.save!
         @job
       end
-    rescue => e
-      @job ||= user.jobs.build(job_attrs)
-      @job.errors.add(:base, e.message)
-      @job
+    rescue ActiveRecord::RecordInvalid => e
+      handle_error(e)
+    rescue ActiveRecord::RecordNotFound => e
+      handle_error(e)
     end
 
     private
@@ -32,8 +32,18 @@ module Jobs
 
       def resolve_technologies
         params[:technologies].map do |tech|
-          tech[:id].present? ? Technology.find(tech[:id]) : Technology.create!(name: tech[:name].strip)
+          if tech[:id].present?
+            Technology.find(tech[:id])
+          else
+            Technology.find_or_create_by!(name: tech[:name].downcase.strip)
+          end
         end
+      end
+
+      def handle_error(error)
+        @job ||= user.jobs.build(job_attrs)
+        @job.errors.add(:base, e.message)
+        @job
       end
   end
 end
