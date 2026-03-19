@@ -8,6 +8,8 @@ FactoryBot.define do
     association :user
     description { Faker::Lorem.paragraph(sentence_count: 2) }
     category { "sales" }
+    location { Faker::Address.country }
+    years_of_experience { rand(1..12) }
 
     trait :with_technology do
       category { "tech" }
