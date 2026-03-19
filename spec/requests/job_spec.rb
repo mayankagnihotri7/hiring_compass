@@ -16,7 +16,9 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         }.to change(Job, :count).by(1)
 
         expect(response).to have_http_status(:ok)
-        expect(json_response).to include("id", "title", "description", "status", "user_id")
+        expect(json_response).to include(
+          "id", "title", "description", "status", "user_id", "category", "location", "years_of_experience"
+        )
       end
     end
 
@@ -56,9 +58,9 @@ RSpec.describe "Api::V1::Jobs", type: :request do
 
   describe "#index" do
     let!(:user_two) { create(:user) }
-    let!(:job_one) { create(:job, user:) }
-    let!(:job_two) { create(:job, user:) }
-    let!(:job_three) { create(:job, user: user_two) }
+    let!(:job_one) { create(:job, :with_technology, user:) }
+    let!(:job_two) { create(:job, :with_technology, user:) }
+    let!(:job_three) { create(:job, :with_technology, user: user_two) }
 
     context "when user id is passed" do
       it "fetches user jobs" do

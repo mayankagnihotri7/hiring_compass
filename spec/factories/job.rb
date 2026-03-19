@@ -7,5 +7,16 @@ FactoryBot.define do
     max_salary { 10000 }
     association :user
     description { Faker::Lorem.paragraph(sentence_count: 2) }
+    category { "sales" }
+    location { Faker::Address.country }
+    years_of_experience { rand(1..12) }
+
+    trait :with_technology do
+      category { "tech" }
+
+      after(:build) do |job|
+        job.technologies << FactoryBot.build(:technology)
+      end
+    end
   end
 end

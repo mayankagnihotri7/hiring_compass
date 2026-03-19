@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :jobs
+      resources :technologies, only: %i[index]
+      get "categories", to: "jobs#categories"
     end
   end
 end
