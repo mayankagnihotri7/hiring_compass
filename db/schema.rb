@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_26_082350) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_19_131901) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -51,9 +51,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_26_082350) do
     t.string "email", null: false
     t.string "phone_number"
     t.boolean "visa_sponsorship_required", default: false, null: false
+    t.string "status", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "status", default: "pending", null: false
     t.index ["job_id"], name: "index_job_applications_on_job_id"
   end
 

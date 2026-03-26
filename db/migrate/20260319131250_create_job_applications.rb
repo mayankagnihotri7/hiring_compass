@@ -10,6 +10,7 @@ class CreateJobApplications < ActiveRecord::Migration[7.2]
       t.string :email, null: false
       t.string :phone_number
       t.boolean :visa_sponsorship_required, default: false, null: false
+      t.string :status, default: "pending", null: false
 
       t.timestamps
     end
