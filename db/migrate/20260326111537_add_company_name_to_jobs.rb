@@ -2,6 +2,6 @@
 
 class AddCompanyNameToJobs < ActiveRecord::Migration[7.2]
   def change
-    add_column :jobs, :company_name, :string, null: false
+    add_column :jobs, :company_name, :string
   end
 end
