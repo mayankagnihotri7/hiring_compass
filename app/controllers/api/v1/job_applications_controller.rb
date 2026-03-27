@@ -5,7 +5,7 @@ module Api
     class JobApplicationsController < ApplicationController
       before_action :authenticate_user!, only: %i[index update]
       before_action :set_job, only: %i[index create show]
-      before_action :set_job_application, only: %i[show]
+      before_action :set_job_application, only: %i[show update]
 
       def index
         render json: @job.as_json(include: :job_applications)
@@ -15,6 +15,9 @@ module Api
         job_application = @job.job_applications.create(job_application_params)
 
         if job_application.persisted?
+          job_application.resume.attach(params[:resume])
+          JobApplicationMailer.application_received(job_application).deliver_later
+
           render json: job_application
         else
           render json: { errors: job_application.errors.full_messages }, status: :unprocessable_entity
@@ -26,8 +29,10 @@ module Api
       end
 
       def update
-        if current_user.role == "admin" || current_user == "recruiter"
-          if @job_application.update(status: params[:status])
+        if current_user.role == "admin" || current_user.role == "recruiter"
+          if @job_application.update(status: update_params)
+            send_response_mail(@job_application)
+
             render json: @job_application
           else
             render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_entity
@@ -40,8 +45,12 @@ module Api
         def job_application_params
           params.require(:job_application).permit(
             :first_name, :last_name, :years_of_experience, :email,
-            :phone_number, :visa_sponsorship_required, :status
+            :phone_number, :visa_sponsorship_required
           )
+        end
+
+        def update_params
+          params.require(:job_application).permit(:status)
         end
 
         def set_job
@@ -50,6 +59,17 @@ module Api
 
         def set_job_application
           @job_application = @job.job_applications.where(id: params[:id]).first
+        end
+
+        def send_response_mail(job_application)
+          case job_application.status
+          when "shortlisted"
+            JobApplicationMailer.application_shortlisted(job_application).deliver_later
+          when "hired"
+            JobApplicationMailer.application_hired(job_application).deliver_later
+          when "rejected"
+            JobApplicationMailer.application_rejected(job_application).deliver_later
+          end
         end
     end
   end
