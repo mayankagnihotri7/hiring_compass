@@ -4,7 +4,7 @@ class Job < ApplicationRecord
   enum :status, %w[open closed paused].index_by(&:itself)
   enum :category, %w[tech sales marketing design product finance operations].index_by(&:itself)
 
-  validates :title, :status, :currency, :category, presence: true
+  validates :title, :status, :currency, :category, :company_name, presence: true
   validates :min_salary, :max_salary, numericality: { greater_than: 0 }
   validates :years_of_experience, presence: true, numericality: { greater_than_or_equal_to: 0 }
 

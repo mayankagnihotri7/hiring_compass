@@ -60,7 +60,7 @@ module Api
         def job_params
           params.require(:job).permit(
             :title, :status, :currency, :min_salary, :max_salary, :description, :category, :location,
-            :years_of_experience,
+            :years_of_experience, :company_name,
             technologies: [:id, :name]
           )
         end

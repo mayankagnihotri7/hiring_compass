@@ -11,11 +11,7 @@ class JobApplication < ApplicationRecord
   validates :years_of_experience, numericality: { greater_than_or_equal_to: 0 }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
 
-  after_update_commit :notify_users
-
-  private
-
-    def notify_users
-      # add mailer to send email.
-    end
+  def full_name
+    "#{first_name} #{last_name}"
+  end
 end
