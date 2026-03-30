@@ -10,6 +10,7 @@ FactoryBot.define do
     category { "sales" }
     location { Faker::Address.country }
     years_of_experience { rand(1..12) }
+    company_name { Faker::Company.name }
 
     trait :with_technology do
       category { "tech" }

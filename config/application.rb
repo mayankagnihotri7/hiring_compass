@@ -45,5 +45,9 @@ module HiringCompass
     config.session_store :cookie_store, key: "_hiring_compass_session"
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
+
+    config.generators do |g|
+      g.orm :active_record, primary_key_type: :uuid
+    end
   end
 end
