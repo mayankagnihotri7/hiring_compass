@@ -12,15 +12,15 @@ module Api
       end
 
       def create
-        job_application = @job.job_applications.create(job_application_params)
+        job_application = @job.job_applications.new(job_application_params)
 
-        if job_application.persisted?
+        if job_application.save
           job_application.resume.attach(params[:resume])
           JobApplicationMailer.application_received(job_application).deliver_later
 
           render json: job_application
         else
-          render json: { errors: job_application.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: job_application.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -35,7 +35,7 @@ module Api
 
             render json: @job_application
           else
-            render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_entity
+            render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_content
           end
         end
       end

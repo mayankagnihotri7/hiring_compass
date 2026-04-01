@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
   validates :address, length: { maximum: 255 }, allow_blank: true
   validates :phone_number, phone: true, presence: true
 
-  before_save :normalize_phone_number
+  before_validation :normalize_phone_number
 
   def full_name
     "#{first_name} #{last_name}"
@@ -26,6 +26,8 @@ class User < ActiveRecord::Base
   private
 
     def normalize_phone_number
-      self.phone_number = Phonelib.parse(phone_number).full_e164
+      parsed = Phonelib.parse(phone_number)
+
+      self.phone_number = parsed.full_e164 if parsed.valid?
     end
 end
