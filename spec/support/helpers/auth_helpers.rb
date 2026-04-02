@@ -21,7 +21,7 @@ module AuthHelpers
     when :post
       post url, headers:, params:
     when :put
-      put url, headers:, params:
+      put url, headers:, params:, as: :json
     when :patch
       put url, headers:, params:
     when :delete

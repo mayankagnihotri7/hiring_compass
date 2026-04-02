@@ -11,10 +11,10 @@ FactoryBot.define do
     status { JobApplication.statuses.keys.sample.to_s }
     
     after(:build) do |job_app|
-      file_path = Rails.root.join("tmp", "Mayank Agnihotri.pdf")
+      file_path = Rails.root.join("tmp", "storage", "resume.pdf")
       job_app.resume.attach(
         io: File.open(file_path),
-        filename: "Mayank Agnihotri.pdf",
+        filename: "resume.pdf",
         content_type: "application/pdf"
       )
     end

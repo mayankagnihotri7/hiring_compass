@@ -4,7 +4,7 @@ module Api
   module V1
     class JobApplicationsController < ApplicationController
       before_action :authenticate_user!, only: %i[index update]
-      before_action :set_job, only: %i[index create show]
+      before_action :set_job, only: %i[index create show update]
       before_action :set_job_application, only: %i[show update]
 
       def index
@@ -15,7 +15,6 @@ module Api
         job_application = @job.job_applications.new(job_application_params)
 
         if job_application.save
-          job_application.resume.attach(params[:resume])
           JobApplicationMailer.application_received(job_application).deliver_later
 
           render json: job_application
@@ -30,7 +29,7 @@ module Api
 
       def update
         if current_user.role == "admin" || current_user.role == "recruiter"
-          if @job_application.update(status: update_params)
+          if @job_application.update(update_params)
             send_response_mail(@job_application)
 
             render json: @job_application
@@ -44,8 +43,8 @@ module Api
 
         def job_application_params
           params.require(:job_application).permit(
-            :first_name, :last_name, :years_of_experience, :email,
-            :phone_number, :visa_sponsorship_required
+            :first_name, :last_name, :years_of_experience, :email, :status,
+            :phone_number, :visa_sponsorship_required, :resume
           )
         end
 

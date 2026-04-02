@@ -13,7 +13,7 @@ class JobApplication < ApplicationRecord
   validates :years_of_experience, numericality: { greater_than_or_equal_to: 0 }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :resume, content_type: ACCEPTED_CONTENT_TYPES,
-    size: { less_than: 1.megabyte, message: "must be less than 1MB" }, attached: true
+    size: { less_than: 1.megabyte, message: "must be less than 1MB" }, attached: true, on: :create
 
   def full_name
     "#{first_name} #{last_name}"
