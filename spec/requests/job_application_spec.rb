@@ -35,6 +35,40 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
         }.to change(JobApplication, :count).by(1)
       end
     end
+
+    context "when resume not attached" do
+      it "does not create" do
+        job_app = attributes_for(:job_application)
+
+        expect {
+          send_request :post,
+            api_v1_job_job_applications_path(job_id: job.id),
+            headers: auth_headers(user),
+            params: {
+              job_application: job_app
+            }.to_json
+        }.to_not change(JobApplication, :count)
+
+        expect(json_response["errors"]).to include("Resume can't be blank")
+      end
+    end
+
+    context "when invalid params" do
+      it "does not create" do
+        job_app = attributes_for(:job_application)
+
+        expect {
+          send_request :post,
+            api_v1_job_job_applications_path(job_id: job.id),
+            headers: auth_headers(user),
+            params: {
+              job_application: job_app.merge(resume: resume, last_name: nil)
+            }.to_json
+        }.to_not change(JobApplication, :count)
+
+        expect(json_response["errors"]).to include("Last name can't be blank")
+      end
+    end
   end
 
   describe "#update" do
@@ -47,7 +81,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
           send_request :put,
             api_v1_job_job_application_path(job_id: job_application.job_id, id: job_application.id),
             headers: auth_headers(user_two),
-            params: { job_application: { status: "hired" } }
+            params: { job_application: { status: "hired" } }.to_json
         }.to have_enqueued_mail(JobApplicationMailer, :application_hired)
 
         expect(json_response["status"]).to eq("hired")
@@ -60,10 +94,33 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
           send_request :put,
             api_v1_job_job_application_path(job_id: job_application.job_id, id: job_application.id),
             headers: auth_headers(user_two),
-            params: { job_application: { status: nil } }
+            params: { job_application: { status: nil } }.to_json
         }.to_not change { job_application.status }
 
         expect(json_response["errors"]).to include("Status can't be blank")
+      end
+    end
+  end
+
+  describe "#show" do
+    let(:user_two) { create(:user, :admin) }
+    let!(:job_application) { create(:job_application) }
+
+    context "when valid id is given" do
+      it "fetches job application" do
+        send_request :get, api_v1_job_job_application_path(job_id: job_application.job_id, id: job_application.id),
+          headers: auth_headers(user_two)
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "when invalid id is given" do
+      it "gives error" do
+        send_request :get, api_v1_job_job_application_path(job_id: job_application.job_id, id: "1234"),
+          headers: auth_headers(user_two)
+
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

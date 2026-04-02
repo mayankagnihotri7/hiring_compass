@@ -57,7 +57,7 @@ module Api
         end
 
         def set_job_application
-          @job_application = @job.job_applications.where(id: params[:id]).first
+          @job_application = @job.job_applications.find(params[:id])
         end
 
         def send_response_mail(job_application)

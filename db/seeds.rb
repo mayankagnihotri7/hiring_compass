@@ -79,7 +79,7 @@ ActiveRecord::Base.transaction do
   end
 
   # JobApplication
-  file_path = Rails.root.join("tmp", "resume.pdf")
+  file_path = Rails.root.join("tmp", "storage", "resume.pdf")
   Job.find_each do |job|
     job_app = job.job_applications.new(
       first_name: Faker::Name.first_name,
