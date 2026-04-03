@@ -14,7 +14,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
         expect {
           send_request :post,
-            api_v1_job_job_applications_path(job_id: job.id),
+            api_v1_job_applications_path(job_id: job.id),
             headers: auth_headers(user),
             params: {
               job_application: job_app.merge(resume: resume)
@@ -27,7 +27,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
         expect {
           send_request :post,
-            api_v1_job_job_applications_path(job_id: job.id),
+            api_v1_job_applications_path(job_id: job.id),
             headers: auth_headers(user),
             params: {
               job_application: job_app.merge(resume: resume)
@@ -42,7 +42,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
         expect {
           send_request :post,
-            api_v1_job_job_applications_path(job_id: job.id),
+            api_v1_job_applications_path(job_id: job.id),
             headers: auth_headers(user),
             params: {
               job_application: job_app
@@ -59,7 +59,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
         expect {
           send_request :post,
-            api_v1_job_job_applications_path(job_id: job.id),
+            api_v1_job_applications_path(job_id: job.id),
             headers: auth_headers(user),
             params: {
               job_application: job_app.merge(resume: resume, last_name: nil)
@@ -79,7 +79,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
       it "sends correct email" do
         expect {
           send_request :put,
-            api_v1_job_job_application_path(job_id: job_application.job_id, id: job_application.id),
+            api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
             headers: auth_headers(user_two),
             params: { job_application: { status: "hired" } }.to_json
         }.to have_enqueued_mail(JobApplicationMailer, :application_hired)
@@ -92,7 +92,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
       it "does not update" do
         expect {
           send_request :put,
-            api_v1_job_job_application_path(job_id: job_application.job_id, id: job_application.id),
+            api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
             headers: auth_headers(user_two),
             params: { job_application: { status: nil } }.to_json
         }.to_not change { job_application.status }
@@ -108,7 +108,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
     context "when valid id is given" do
       it "fetches job application" do
-        send_request :get, api_v1_job_job_application_path(job_id: job_application.job_id, id: job_application.id),
+        send_request :get, api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
           headers: auth_headers(user_two)
 
         expect(response).to have_http_status(:ok)
@@ -117,7 +117,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
     context "when invalid id is given" do
       it "gives error" do
-        send_request :get, api_v1_job_job_application_path(job_id: job_application.job_id, id: "1234"),
+        send_request :get, api_v1_job_application_path(job_id: job_application.job_id, id: "1234"),
           headers: auth_headers(user_two)
 
         expect(response).to have_http_status(:not_found)
