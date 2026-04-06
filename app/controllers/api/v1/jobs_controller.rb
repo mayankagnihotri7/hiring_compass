@@ -19,6 +19,7 @@ module Api
 
       def create
         job = Jobs::SaveService.new(current_user, job_params).call
+        authorize job
 
         if job.persisted?
           render json: job, status: :ok
@@ -32,6 +33,8 @@ module Api
       end
 
       def update
+        authorize @job
+
         Jobs::SaveService.new(current_user, job_params, @job).call
 
         if @job.errors.empty?
@@ -42,6 +45,8 @@ module Api
       end
 
       def destroy
+        authorize @job
+
         @job.destroy
 
         head :no_content

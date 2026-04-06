@@ -52,3 +52,5 @@ end
 gem "devise", "~> 4.9"
 gem "devise_token_auth"
 gem "phonelib"
+
+gem "pundit", "~> 2.5"

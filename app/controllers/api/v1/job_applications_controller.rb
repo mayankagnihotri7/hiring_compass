@@ -28,14 +28,14 @@ module Api
       end
 
       def update
-        if current_user.role == "admin" || current_user.role == "recruiter"
-          if @job_application.update(update_params)
-            send_response_mail(@job_application)
+        authorize @job_application
 
-            render json: @job_application
-          else
-            render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_content
-          end
+        if @job_application.update(update_params)
+          send_response_mail(@job_application)
+
+          render json: @job_application
+        else
+          render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_content
         end
       end
 

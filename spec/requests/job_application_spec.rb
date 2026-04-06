@@ -73,6 +73,7 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
   describe "#update" do
     let(:user_two) { create(:user, :admin) }
+    let(:user_three) { create(:user) }
     let(:job_application) { create(:job_application) }
 
     context "when valid params" do
@@ -85,6 +86,17 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
         }.to have_enqueued_mail(JobApplicationMailer, :application_hired)
 
         expect(json_response["status"]).to eq("hired")
+      end
+    end
+
+    context "when user is not creator" do
+      it "cannot update the application status" do
+        expect {
+          send_request :put,
+            api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
+            headers: auth_headers(user_three),
+            params: { job_application: { status: "closed" } }.to_json
+        }.to raise_error(Pundit::NotAuthorizedError)
       end
     end
 
