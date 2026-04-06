@@ -54,6 +54,31 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context "when technology not present for tech" do
+
+      it "shows error" do
+        invalid_job_params = attributes_for(:job, category: "tech")
+
+        expect {
+          send_request :post, api_v1_jobs_path(job: invalid_job_params), headers: auth_headers(user)
+        }.not_to change(Job, :count)
+
+        expect(json_response["errors"]).to include("Technologies must be present for tech jobs")
+      end
+    end
+
+    context "min salary is greater than max salary" do
+      it "shows error" do
+        invalid_job_params = attributes_for(:job, min_salary: 10000, max_salary: 9000)
+
+        expect {
+          send_request :post, api_v1_jobs_path(job: invalid_job_params), headers: auth_headers(user)
+        }.not_to change(Job, :count)
+
+        expect(json_response["errors"]).to include("Max salary must be greater than or equal to min salary")
+      end
+    end
   end
 
   describe "#index" do
