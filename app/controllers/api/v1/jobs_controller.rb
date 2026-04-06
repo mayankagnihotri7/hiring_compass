@@ -12,7 +12,7 @@ module Api
         jobs = if params[:user_id].present?
                  Job.includes(:technologies).where(user_id: params[:user_id])
                else
-                 Job.includes(:technologies).all
+                 filter_jobs
                end
         render json: jobs.as_json(include: :technologies)
       end
@@ -63,6 +63,19 @@ module Api
             :years_of_experience, :company_name,
             technologies: [:id, :name]
           )
+        end
+
+        def filter_jobs
+          jobs = Job.includes(:technologies).all
+          jobs = jobs.search_by_text(params[:q]) if params[:q].present?
+          jobs = jobs.by_category(params[:category]) if params[:category].present?
+          jobs = jobs.includes(:technologies).by_technology(params[:technology]) if params[:technology].present?
+          jobs = jobs.by_experience(params[:years_of_experience]) if params[:years_of_experience].present?
+          jobs = jobs.by_location(params[:location]) if params[:location].present?
+          jobs = jobs.by_status(params[:status]) if params[:status].present?
+          jobs = jobs.by_min_salary(params[:min_salary]) if params[:min_salary].present?
+          jobs = jobs.by_max_salary(params[:max_salary]) if params[:max_salary].present?
+          jobs
         end
     end
   end

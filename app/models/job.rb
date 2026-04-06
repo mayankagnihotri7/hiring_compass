@@ -16,6 +16,15 @@ class Job < ApplicationRecord
   has_many :job_applications, dependent: :destroy
 
   belongs_to :user
+  # rubocop:disable Layout/LineLength
+  scope :search_by_text, ->(query) { where("title ILIKE ? OR company_name ILIKE ?", "%#{query}%", "%#{query}%") if query.present? }
+  scope :by_category, ->(category) { where(category: category) if category.present? }
+  scope :by_technology, ->(tech_name) { joins(:technologies).where("technologies.name ILIKE ?", "%#{tech_name}%") if tech_name.present? }
+  scope :by_experience, ->(years) { where("years_of_experience <= ?", years) if years.present? }
+  scope :by_location, ->(location) { where("location ILIKE ?", "%#{location}%") }
+  scope :by_status, ->(status_name) { where(status_name: status_name) if status_name.present? }
+  scope :by_min_salary, ->(min_salary) { where("min_salary >= ?", min_salary) if min_salary.present? }
+  scope :by_max_salary, ->(max_salary) { where("max_salary <= ?", max_salary) if max_salary.present? }
 
   private
 
