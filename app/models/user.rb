@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
   include DeviseTokenAuth::Concerns::User
 
-  enum role: %w[recruiter admin].index_by(&:itself)
+  enum :role, %w[recruiter admin].index_by(&:itself)
 
   has_many :jobs
 

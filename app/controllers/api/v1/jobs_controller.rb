@@ -23,7 +23,7 @@ module Api
         if job.persisted?
           render json: job, status: :ok
         else
-          render json: { errors: job.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: job.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -37,7 +37,7 @@ module Api
         if @job.errors.empty?
           render json: @job
         else
-          render json: { errors: @job.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @job.errors.full_messages }, status: :unprocessable_content
         end
       end
 

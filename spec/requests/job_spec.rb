@@ -30,7 +30,7 @@ RSpec.describe "Api::V1::Jobs", type: :request do
           send_request :post, api_v1_jobs_path(job: invalid_job_params), headers: auth_headers(user)
         }.not_to change(Job, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(json_response["errors"]).to include("Title can't be blank")
       end
     end
@@ -52,6 +52,31 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         send_request :post, api_v1_jobs_path(job: {}), headers: auth_headers(user)
 
         expect(response).to have_http_status(:bad_request)
+      end
+    end
+
+    context "when technology not present for tech" do
+
+      it "shows error" do
+        invalid_job_params = attributes_for(:job, category: "tech")
+
+        expect {
+          send_request :post, api_v1_jobs_path(job: invalid_job_params), headers: auth_headers(user)
+        }.not_to change(Job, :count)
+
+        expect(json_response["errors"]).to include("Technologies must be present for tech jobs")
+      end
+    end
+
+    context "min salary is greater than max salary" do
+      it "shows error" do
+        invalid_job_params = attributes_for(:job, min_salary: 10000, max_salary: 9000)
+
+        expect {
+          send_request :post, api_v1_jobs_path(job: invalid_job_params), headers: auth_headers(user)
+        }.not_to change(Job, :count)
+
+        expect(json_response["errors"]).to include("Max salary must be greater than or equal to min salary")
       end
     end
   end
@@ -78,6 +103,66 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         expect(json_response.count).to eq(3)
       end
     end
+
+    context "when query params are passed" do
+      it "filters results" do
+        tech_name = job_one.technologies.first.name
+
+        send_request :get, api_v1_jobs_path(technology: tech_name), headers: auth_headers(user)
+
+        expect(json_response.count).to eq(1)
+        expect(json_response[0]["technologies"].map { |tech| tech["name"] }).to include(tech_name)
+      end
+
+      it "filters by salary range" do
+        job_four = create(:job, :with_technology, min_salary: 50000, max_salary: 80000, user: user_two)
+        job_five = create(:job, :with_technology, min_salary: 90000, max_salary: 120000, user: user_two)
+
+        send_request :get, api_v1_jobs_path(min_salary: 50000, max_salary: 100000), headers: auth_headers(user)
+
+        expect(json_response.count).to eq(1)
+        expect(json_response[0]["id"]).to eq(job_four.id)
+      end
+
+      it "filters by category" do
+        marketing_job = create(:job, category: "marketing", user: user)
+
+        send_request :get, api_v1_jobs_path(category: "tech"), headers: auth_headers(user)
+
+        tech_jobs = json_response.map { |tech| tech["category"] }
+
+        expect(tech_jobs).to all(eq("tech"))
+        expect(tech_jobs).not_to include(marketing_job.category)
+      end
+
+      it "filters by status" do
+        closed_job = create(:job, status: "closed", user: user)
+        paused_job = create(:job, status: "paused", user: user)
+
+        send_request :get, api_v1_jobs_path(status: "open"), headers: auth_headers(user)
+
+        job_status = json_response.map { |st| st["status"] }
+
+        expect(job_status).not_to include(closed_job.status, paused_job.status)
+      end
+
+      it "combines multiple filters" do
+        tech_name = job_one.technologies.first.name
+
+        send_request :get, api_v1_jobs_path(
+          technology: tech_name,
+          category: "tech",
+          min_salary: 1000
+        ), headers: auth_headers(user)
+
+        expect(json_response.count).to be >= 1
+
+        json_response.each do |job|
+          expect(job["category"]).to eq("tech")
+          expect(job["min_salary"]).to be >= 1000
+        end
+      end
+    end
   end
 
   describe "#update" do
@@ -100,7 +185,7 @@ RSpec.describe "Api::V1::Jobs", type: :request do
           :put, api_v1_job_path(id: job.id), headers: auth_headers(user),
           params: { job: { title: nil } }.to_json)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
