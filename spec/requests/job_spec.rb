@@ -30,7 +30,7 @@ RSpec.describe "Api::V1::Jobs", type: :request do
           send_request :post, api_v1_jobs_path(job: invalid_job_params), headers: auth_headers(user)
         }.not_to change(Job, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(json_response["errors"]).to include("Title can't be blank")
       end
     end
@@ -160,7 +160,7 @@ RSpec.describe "Api::V1::Jobs", type: :request do
           :put, api_v1_job_path(id: job.id), headers: auth_headers(user),
           params: { job: { title: nil } }.to_json)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
