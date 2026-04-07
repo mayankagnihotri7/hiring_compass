@@ -19,4 +19,8 @@ class JobApplicationPolicy
   def show?
     update?
   end
+
+  def download?
+    update?
+  end
 end

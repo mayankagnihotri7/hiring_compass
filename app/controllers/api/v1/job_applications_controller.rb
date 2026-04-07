@@ -4,8 +4,8 @@ module Api
   module V1
     class JobApplicationsController < ApplicationController
       before_action :authenticate_user!, only: %i[index update]
-      before_action :set_job, only: %i[index create show update]
-      before_action :set_job_application, only: %i[show update]
+      before_action :set_job, only: %i[index create show update download]
+      before_action :set_job_application, only: %i[show update download]
 
       def index
         render json: @job.as_json(include: :job_applications)
@@ -39,6 +39,18 @@ module Api
           render json: @job_application
         else
           render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_content
+        end
+      end
+
+      def download
+        # rubocop:disable Layout/ArgumentAlignment
+        if @job_application.resume.attached?
+          send_data @job_application.resume.download,
+                    filename: @job_application.resume.filename.to_s,
+                    type: @job_application.resume.content_type,
+                    disposition: "attachment"
+        else
+          render json: { error: "File not attached" }, status: :not_found
         end
       end
 
