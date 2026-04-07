@@ -4,7 +4,7 @@ module Api
   module V1
     class JobApplicationsController < ApplicationController
       before_action :authenticate_user!, only: %i[index update]
-      before_action :set_job, only: %i[index create show update]
+      before_action :set_job, only: %i[index create show update download]
       before_action :set_job_application, only: %i[show update download]
 
       def index
@@ -50,7 +50,7 @@ module Api
                     type: @job_application.resume.content_type,
                     disposition: "attachment"
         else
-          render json: { error: "File not attached" }, status: :unprocessable_content
+          render json: { error: "File not attached" }, status: :not_found
         end
       end
 

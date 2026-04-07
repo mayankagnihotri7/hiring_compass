@@ -154,6 +154,27 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
     end
   end
 
+  describe "#download" do
+    let!(:job_application) { create(:job_application) }
+
+    it "returns the file as attachment" do
+      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers["Content-Type"]).to eq("application/pdf")
+      expect(response.headers["Content-Disposition"]).to include("attachment")
+      expect(response.headers["Content-Disposition"]).to include("filename=\"resume.pdf\"")
+    end
+
+    it "returns 404 if no file attached" do
+      job_application.resume.purge
+
+      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   private
 
     def fixture_file_upload(filename)
