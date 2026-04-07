@@ -13,6 +13,7 @@ module Api
 
       def create
         job_application = @job.job_applications.new(job_application_params)
+        authorize job_application
 
         if job_application.save
           JobApplicationMailer.application_received(job_application).deliver_later
@@ -24,6 +25,8 @@ module Api
       end
 
       def show
+        authorize @job_application
+
         render json: @job_application
       end
 

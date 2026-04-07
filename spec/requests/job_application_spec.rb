@@ -69,6 +69,23 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
         expect(json_response["errors"]).to include("Last name can't be blank")
       end
     end
+
+    context "when job is not open" do
+      let(:job_two) { create(:job, user: user, status: "paused") }
+
+      it "does not create application" do
+        job_app = attributes_for(:job_application)
+
+        expect {
+          send_request :post,
+            api_v1_job_applications_path(job_id: job_two.id),
+            headers: auth_headers(user),
+            params: {
+              job_application: job_app.merge(resume: resume)
+            }.to_json
+        }.to raise_error(Pundit::NotAuthorizedError)
+      end
+    end
   end
 
   describe "#update" do
