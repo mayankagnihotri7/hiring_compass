@@ -211,12 +211,13 @@ RSpec.describe "Api::V1::Jobs", type: :request do
   end
 
   describe "#destroy" do
+    let(:user_two) { create(:user, :admin) }
     let!(:job) { create(:job, user:) }
 
     context "when valid id given" do
       it "removes job" do
         expect {
-          send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user)
+          send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user_two)
         }.to change(Job, :count).by(-1)
 
         expect(response).to have_http_status(:no_content)
@@ -237,6 +238,14 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         send_request :delete, api_v1_job_path(id: job.id)
 
         expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when user is recruiter" do
+      it "cannot delete job" do
+        expect {
+          send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user)
+        }.to raise_error(Pundit::NotAuthorizedError)
       end
     end
   end

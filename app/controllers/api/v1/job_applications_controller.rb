@@ -13,6 +13,7 @@ module Api
 
       def create
         job_application = @job.job_applications.new(job_application_params)
+        authorize job_application
 
         if job_application.save
           JobApplicationMailer.application_received(job_application).deliver_later
@@ -24,18 +25,20 @@ module Api
       end
 
       def show
+        authorize @job_application
+
         render json: @job_application
       end
 
       def update
-        if current_user.role == "admin" || current_user.role == "recruiter"
-          if @job_application.update(update_params)
-            send_response_mail(@job_application)
+        authorize @job_application
 
-            render json: @job_application
-          else
-            render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_content
-          end
+        if @job_application.update(update_params)
+          send_response_mail(@job_application)
+
+          render json: @job_application
+        else
+          render json: { errors: @job_application.errors.full_messages }, status: :unprocessable_content
         end
       end
 
