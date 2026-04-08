@@ -79,6 +79,22 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         expect(json_response["errors"]).to include("Max salary must be greater than or equal to min salary")
       end
     end
+
+    context "when rate limiting" do
+      it "rate limits requests" do
+        job = attributes_for(:job, user_id: user.id)
+
+        4.times do
+          send_request :post, api_v1_jobs_path(job:), headers: auth_headers(user)
+
+          expect(response).not_to have_http_status(:too_many_requests)
+        end
+
+        send_request :post, api_v1_jobs_path(job:), headers: auth_headers(user)
+
+        expect(response).not_to have_http_status(:too_many_requests)
+      end
+    end
   end
 
   describe "#index" do
@@ -188,6 +204,26 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
+
+    context "when rate limiting" do
+      it "rate limits requests" do
+        29.times do
+          send_request(
+            :put, api_v1_job_path(id: job.id), headers: auth_headers(user),
+            params: { job: { title: "Senior Rails Dev" } }.to_json
+          )
+
+          expect(response).not_to have_http_status(:too_many_requests)
+        end
+
+        send_request(
+          :put, api_v1_job_path(id: job.id), headers: auth_headers(user),
+          params: { job: { title: "Senior Rails Dev" } }.to_json
+        )
+
+        expect(response).not_to have_http_status(:too_many_requests)
+      end
+    end
   end
 
   describe "#show" do
@@ -246,6 +282,20 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         expect {
           send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user)
         }.to raise_error(Pundit::NotAuthorizedError)
+      end
+    end
+
+    context "when rate limiting" do
+      it "rate limits requests" do
+        9.times do
+          send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user_two)
+
+          expect(response).not_to have_http_status(:too_many_requests)
+        end
+
+        send_request :delete, api_v1_job_path(id: job.id), headers: auth_headers(user_two)
+
+        expect(response).not_to have_http_status(:too_many_requests)
       end
     end
   end

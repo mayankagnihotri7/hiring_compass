@@ -86,6 +86,32 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
         }.to raise_error(Pundit::NotAuthorizedError)
       end
     end
+
+    context "when rate limiting" do
+      it "rate limits requests" do
+        job_app = attributes_for(:job_application)
+
+        14.times do
+          send_request :post,
+            api_v1_job_applications_path(job_id: job.id),
+            headers: auth_headers(user),
+            params: {
+              job_application: job_app.merge(resume: resume)
+            }
+
+          expect(response).not_to have_http_status(:too_many_requests)
+        end
+
+        send_request :post,
+          api_v1_job_applications_path(job_id: job.id),
+          headers: auth_headers(user),
+          params: {
+            job_application: job_app.merge(resume: resume)
+          }
+
+        expect(response).not_to have_http_status(:too_many_requests)
+      end
+    end
   end
 
   describe "#update" do
@@ -127,6 +153,26 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
         }.to_not change { job_application.status }
 
         expect(json_response["errors"]).to include("Status can't be blank")
+      end
+    end
+
+    context "when rate limiting" do
+      it "rate limits requests" do
+        14.times do
+          send_request :put,
+            api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
+            headers: auth_headers(user_two),
+            params: { job_application: { status: "hired" } }.to_json
+
+          expect(response).not_to have_http_status(:too_many_requests)
+        end
+
+        send_request :put,
+          api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
+          headers: auth_headers(user_two),
+          params: { job_application: { status: "hired" } }.to_json
+
+        expect(response).not_to have_http_status(:too_many_requests)
       end
     end
   end
@@ -172,6 +218,18 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
       get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it "rate limits requests" do
+      14.times do
+        get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
+
+        expect(response).not_to have_http_status(:too_many_requests)
+      end
+
+      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
+
+      expect(response).not_to have_http_status(:too_many_requests)
     end
   end
 
