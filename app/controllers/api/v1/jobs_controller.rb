@@ -3,16 +3,23 @@
 module Api
   module V1
     class JobsController < ApplicationController
+      include RateLimitable
+
       before_action :authenticate_user!, only: %i[update destroy create]
       before_action :set_job, only: %i[update show destroy]
+
+      rate_limit_create to: 5, within: 1.minute
+      rate_limit_update to: 30, within: 1.minute
+      rate_limit_destroy to: 10, within: 1.minute
 
       def index
         # rubocop:disable Layout/IndentationWidth
         # rubocop:disable Layout/EndAlignment
         jobs = if params[:user_id].present?
-                 Job.includes(:technologies).where(user_id: params[:user_id])
+                 user_jobs = Job.includes(:technologies).where(user_id: params[:user_id])
+                 filter_jobs(user_jobs)
                else
-                 filter_jobs
+                 filter_jobs(Job.includes(:technologies).all)
                end
         render json: jobs.as_json(include: :technologies)
       end
@@ -70,8 +77,7 @@ module Api
           )
         end
 
-        def filter_jobs
-          jobs = Job.includes(:technologies).all
+        def filter_jobs(jobs)
           jobs = jobs.search_by_text(params[:q]) if params[:q].present?
           jobs = jobs.by_category(params[:category]) if params[:category].present?
           jobs = jobs.includes(:technologies).by_technology(params[:technology]) if params[:technology].present?
