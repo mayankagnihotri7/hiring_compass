@@ -191,5 +191,3 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 ## License
 This project is open source and licensed under the MIT license.
 
-Project Link: [https://github.com/mayankagnihotri7/hiring_compass](https://github.com/mayankagnihotri7/hiring_compass)
-
