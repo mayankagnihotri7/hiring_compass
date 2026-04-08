@@ -3,9 +3,15 @@
 module Api
   module V1
     class JobApplicationsController < ApplicationController
+      include RateLimitable
+
       before_action :authenticate_user!, only: %i[index update]
       before_action :set_job, only: %i[index create show update download]
       before_action :set_job_application, only: %i[show update download]
+
+      rate_limit_create to: 15, within: 1.minute
+      rate_limit_update to: 15, within: 1.minute
+      rate_limit_download to: 15, within: 1.minute
 
       def index
         render json: @job.as_json(include: :job_applications)
