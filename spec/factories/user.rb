@@ -7,6 +7,7 @@ FactoryBot.define do
     address { Faker::Address.full_address }
     phone_number { "+91 1234567890" }
     password { "password" }
+    confirmed_at { DateTime.now }
 
     trait :admin do
       role { "admin" }
