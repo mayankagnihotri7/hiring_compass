@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class Auth::ConfirmationsController < ApplicationController
+class Auth::ConfirmationsController < DeviseTokenAuth::ConfirmationsController
   def show
-    user = resource_class.confirm_by(params[:confirmation_token])
+    user = resource_class.confirm_by_token(params[:confirmation_token])
 
     if user.errors.empty?
       render json: {
