@@ -11,11 +11,11 @@ ActiveRecord::Base.transaction do
       last_name: Faker::Name.last_name,
       bio: Faker::Lorem.paragraph(sentence_count: 2),
       phone_number: [
-        "+1 555 123 4567",
-        "+44 20 7946 0858",
-        "+91 98765 43210",
-        "+852 9123 4567",
-        "+86 138 0013 8000"
+        "+1; 555 123 4567",
+        "+44; 20 7946 0858",
+        "+91; 98765 43210",
+        "+852; 9123 4567",
+        "+86; 138 0013 8000"
       ].sample
     )
   end
@@ -28,11 +28,11 @@ ActiveRecord::Base.transaction do
     bio: Faker::Lorem.paragraph(sentence_count: 2),
     role: "admin",
     phone_number: [
-      "+1 555 123 4567",
-      "+44 20 7946 0858",
-      "+91 98765 43210",
-      "+852 9123 4567",
-      "+86 138 0013 8000"
+      "+1; 555 123 4567",
+      "+44; 20 7946 0858",
+      "+91; 98765 43210",
+      "+852; 9123 4567",
+      "+86; 138 0013 8000"
     ].sample
   )
 

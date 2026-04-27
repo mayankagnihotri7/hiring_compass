@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :validatable
+    :recoverable, :rememberable, :validatable, :confirmable
 
   include DeviseTokenAuth::Concerns::User
 
@@ -12,12 +12,12 @@ class User < ActiveRecord::Base
 
   has_many :jobs
 
-  validates :first_name, :last_name, presence: true, format: { with: /\A[a-zA-Z\s]+\z/ }, length: { maximum: 20 }
+  before_validation :normalize_phone_number
+
+  validates :first_name, :last_name, presence: true, format: { with: /\A[\p{L}\s'-]+\z/ }, length: { maximum: 20 }
   validates :bio, length: { maximum: 500 }, allow_blank: true
   validates :address, length: { maximum: 255 }, allow_blank: true
-  validates :phone_number, phone: true, presence: true
-
-  before_validation :normalize_phone_number
+  validates :phone_number, presence: true
 
   def full_name
     "#{first_name} #{last_name}"
@@ -26,6 +26,8 @@ class User < ActiveRecord::Base
   private
 
     def normalize_phone_number
+      return if phone_number.blank?
+
       parsed = Phonelib.parse(phone_number)
 
       self.phone_number = parsed.full_e164 if parsed.valid?
