@@ -40,4 +40,12 @@ class JobApplicationMailer < ApplicationMailer
 
     mail(to: @job_application.email, subject: "Congratulations! Offer from #{@company_name}")
   end
+
+  def verification_code(first_name, email, code)
+    @first_name = first_name
+    @email = email
+    @code = code
+
+    mail(to: @email, subject: "Security code for your job application")
+  end
 end
