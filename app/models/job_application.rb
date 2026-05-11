@@ -18,6 +18,9 @@ class JobApplication < ApplicationRecord
   validate :verify_otp, on: :create
 
   def self.generate_otp(email)
+    data = Rails.cache.read("otp_#{email}")
+    return data if data.present?
+
     code = rand(100_000..999_9999).to_s
 
     Rails.cache.write("otp_#{email}", code, expires_in: 15.minutes)
