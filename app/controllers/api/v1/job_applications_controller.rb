@@ -75,6 +75,11 @@ module Api
         else
           render json: { error: "Valid email is required." }, status: :unprocessable_content
         end
+
+      rescue OtpVerifiable::OtpCooldownError
+        render json: { errors: "Please wait before requesting another code." }, status: :too_many_requests
+      rescue OtpVerifiable::OtpRateLimitError
+        render json: { errors: "Too many attempts. Please try again later." }, status: :too_many_requests
       end
 
       private
