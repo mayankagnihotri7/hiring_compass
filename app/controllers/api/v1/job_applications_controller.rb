@@ -22,8 +22,6 @@ module Api
         authorize job_application
 
         if job_application.save
-          Rails.cache.delete("otp_#{job_application.email}")
-
           JobApplicationMailer.application_received(job_application).deliver_later
 
           render json: job_application
