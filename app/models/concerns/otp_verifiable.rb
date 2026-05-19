@@ -20,7 +20,7 @@ module OtpVerifiable
 
   class_methods do
     def generate_otp(email)
-      raise OtpCooldownError if Rails.cache.exists?("otp_cooldown_#{email}")
+      raise OtpCooldownError if Rails.cache.exist?("otp_cooldown_#{email}")
       raise OtpRateLimitError if Rails.cache.read("otp_sends_#{email}").to_i >= MAX_SENDS
 
       code = Rails.cache.fetch("otp_#{email}", expires_in: OTP_TTL) do
