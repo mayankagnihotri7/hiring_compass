@@ -20,6 +20,10 @@ Rails.application.routes.draw do
           member do
             get :download
           end
+
+          collection do
+            post :send_otp
+          end
         end
       end
 

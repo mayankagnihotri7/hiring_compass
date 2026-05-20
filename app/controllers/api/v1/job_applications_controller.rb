@@ -60,12 +60,32 @@ module Api
         end
       end
 
+      def send_otp
+        email = job_application_params[:email]
+        first_name = job_application_params[:first_name]
+
+        if email.present? && email.match?(URI::MailTo::EMAIL_REGEXP)
+          code = JobApplication.generate_otp(email)
+
+          JobApplicationMailer.verification_code(first_name, email, code).deliver_later
+
+          render json: { message: "Verification code sent." }, status: :ok
+        else
+          render json: { error: "Valid email is required." }, status: :unprocessable_content
+        end
+
+      rescue OtpVerifiable::OtpCooldownError
+        render json: { errors: "Please wait before requesting another code." }, status: :too_many_requests
+      rescue OtpVerifiable::OtpRateLimitError
+        render json: { errors: "Too many attempts. Please try again later." }, status: :too_many_requests
+      end
+
       private
 
         def job_application_params
           params.require(:job_application).permit(
             :first_name, :last_name, :years_of_experience, :email, :status,
-            :phone_number, :visa_sponsorship_required, :resume
+            :phone_number, :visa_sponsorship_required, :resume, :otp_code
           )
         end
 

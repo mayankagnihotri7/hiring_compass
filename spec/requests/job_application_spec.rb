@@ -7,6 +7,10 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
   let!(:job) { create(:job, user: user) }
   let!(:resume) { fixture_file_upload(Rails.root.join("tmp", "storage", "resume.pdf")) }
 
+  before do
+    allow_any_instance_of(JobApplication).to receive(:verify_otp).and_return(true)
+  end
+
   describe "#create" do
     context "when valid params are passed" do
       it "sends email on create" do

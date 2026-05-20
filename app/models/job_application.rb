@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class JobApplication < ApplicationRecord
+  include OtpVerifiable
+
   ACCEPTED_CONTENT_TYPES = ["application/pdf", "application/msword"].freeze
 
   enum :status, %w[pending reviewed shortlisted rejected hired withdrawn].index_by(&:itself)
@@ -8,6 +10,8 @@ class JobApplication < ApplicationRecord
   belongs_to :job
 
   has_one_attached :resume
+
+  before_validation :normalize_email
 
   validates :first_name, :last_name, :email, :years_of_experience, :status, presence: true
   validates :years_of_experience, numericality: { greater_than_or_equal_to: 0 }
@@ -17,5 +21,9 @@ class JobApplication < ApplicationRecord
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  def normalize_email
+    self.email = email.to_s.downcase.strip if email.present?
   end
 end
