@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require "sidekiq/web"
+
 Rails.application.routes.draw do
+  mount Sidekiq::Web => "/sidekiq"
+
   mount_devise_token_auth_for "User", at: "auth", controllers: {
     confirmations: "auth/confirmations"
   }

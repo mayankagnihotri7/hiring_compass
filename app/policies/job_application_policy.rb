@@ -23,4 +23,8 @@ class JobApplicationPolicy
   def download?
     update?
   end
+
+  def bulk_update?
+    update?
+  end
 end

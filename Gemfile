@@ -55,3 +55,5 @@ gem "devise_token_auth"
 gem "phonelib"
 gem "pundit", "~> 2.5"
 gem "redis", "~> 5.4"
+
+gem "sidekiq", "~> 8.0"

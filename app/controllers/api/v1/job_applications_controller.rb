@@ -80,6 +80,26 @@ module Api
         render json: { errors: "Too many attempts. Please try again later." }, status: :too_many_requests
       end
 
+      def bulk_update
+        authorize JobApplication, :bulk_update?
+
+        ids = ids_params[:ids]
+        status = ids_params[:status]
+
+        ActiveRecord::Base.transaction do
+          found = JobApplication.where(id: ids)
+          found.update_all(status: status)
+
+          BulkStatusUpdateJob.perform_async(found.pluck(:id))
+
+          render json: { message: "Job Applications updated." }, status: :ok
+        end
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.message }, status: :unprocessable_content
+      rescue => e
+        render json: { errors: "Something went wrong." }, status: :internal_server_error
+      end
+
       private
 
         def job_application_params
@@ -91,6 +111,10 @@ module Api
 
         def update_params
           params.require(:job_application).permit(:status)
+        end
+
+        def ids_params
+          params.require(:job_application).permit(:status, ids: [])
         end
 
         def set_job
