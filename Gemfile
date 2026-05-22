@@ -49,7 +49,7 @@ group :development, :test do
   gem "shoulda-matchers"
 end
 
-gem "connection_pool", "~> 3.0"
+gem "connection_pool", "~> 2.4"
 gem "devise", "~> 4.9"
 gem "devise_token_auth"
 gem "phonelib"

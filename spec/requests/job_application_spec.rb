@@ -237,6 +237,22 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
     end
   end
 
+  describe "#bulk_update" do
+    let(:job_application_one) { create(:job_application, job: job) }
+    let(:job_application_two) { create(:job_application, job: job) }
+    let(:job_application_three) { create(:job_application, job: job) }
+
+    it "bulk updates job applications" do
+      id_params = [job_application_one.id, job_application_two.id, job_application_three.id]
+
+      send_request :patch, bulk_update_status_api_v1_job_applications_path(job_id: job.id),
+        headers: auth_headers(user),
+        params: { job_application: { ids: id_params, status: "rejected" } }.to_json
+
+      expect(job_application_one.reload.status).to eql("rejected")
+    end
+  end
+
   private
 
     def fixture_file_upload(filename)

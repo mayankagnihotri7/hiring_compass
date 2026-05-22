@@ -10,8 +10,10 @@ class JobApplicationPolicy
     def resolve
       if user.admin?
         scope.all
-      else
+      elsif User.roles.include?(user.role)
         scope.joins(:job).where(jobs: { user: user })
+      else
+        raise Pundit::NotAuthorizedError, "not authorized to perform this action."
       end
     end
 
