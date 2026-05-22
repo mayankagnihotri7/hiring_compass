@@ -253,6 +253,17 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
 
       expect(job_application_one.reload.status).to eql("rejected")
     end
+
+    it "not update when wrong status" do
+      id_params = [job_application_one.id, job_application_two.id]
+
+      send_request :patch, bulk_update_status_api_v1_job_applications_path(job_id: job.id),
+        headers: auth_headers(user),
+        params: { job_application: { ids: id_params, status: "accepted" } }.to_json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json_response["errors"]).to include("invalid status")
+    end
   end
 
   private

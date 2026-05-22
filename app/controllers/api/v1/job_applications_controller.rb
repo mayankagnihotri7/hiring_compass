@@ -81,9 +81,14 @@ module Api
       end
 
       def bulk_update_status
+        status = ids_params[:status]
+
+        unless JobApplication.statuses.key?(status)
+          return render json: { errors: "invalid status" }, status: :unprocessable_content
+        end
+
         ids = ids_params[:ids]
         job_applications = policy_scope(JobApplication)
-        status = ids_params[:status]
 
         ActiveRecord::Base.transaction do
           found = job_applications.where(id: ids)
