@@ -27,6 +27,7 @@ Rails.application.routes.draw do
 
           collection do
             post :send_otp
+            patch :bulk_update_status
           end
         end
       end

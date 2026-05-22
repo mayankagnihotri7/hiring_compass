@@ -5,8 +5,8 @@ module Api
     class JobApplicationsController < ApplicationController
       include RateLimitable
 
-      before_action :authenticate_user!, only: %i[index update]
-      before_action :set_job, only: %i[index create show update download]
+      before_action :authenticate_user!, only: %i[index update download bulk_update_status]
+      before_action :set_job, only: %i[index create show update download bulk_update_status]
       before_action :set_job_application, only: %i[show update download]
 
       rate_limit_create to: 15, within: 1.minute
@@ -80,14 +80,13 @@ module Api
         render json: { errors: "Too many attempts. Please try again later." }, status: :too_many_requests
       end
 
-      def bulk_update
-        authorize JobApplication, :bulk_update?
-
+      def bulk_update_status
         ids = ids_params[:ids]
+        job_applications = policy_scope(JobApplication)
         status = ids_params[:status]
 
         ActiveRecord::Base.transaction do
-          found = JobApplication.where(id: ids)
+          found = job_applications.where(id: ids)
           found.update_all(status: status)
 
           BulkStatusUpdateJob.perform_async(found.pluck(:id))
