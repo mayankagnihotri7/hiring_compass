@@ -208,7 +208,8 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
     let!(:job_application) { create(:job_application) }
 
     it "returns the file as attachment" do
-      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
+      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
+        headers: auth_headers(user)
 
       expect(response).to have_http_status(:ok)
       expect(response.headers["Content-Type"]).to eq("application/pdf")
@@ -219,7 +220,8 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
     it "returns 404 if no file attached" do
       job_application.resume.purge
 
-      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
+      get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id),
+        headers: auth_headers(user)
 
       expect(response).to have_http_status(:not_found)
     end
@@ -234,6 +236,33 @@ RSpec.describe "Api::V1::JobApplicationsController", type: :request do
       get download_api_v1_job_application_path(job_id: job_application.job_id, id: job_application.id)
 
       expect(response).not_to have_http_status(:too_many_requests)
+    end
+  end
+
+  describe "#bulk_update" do
+    let(:job_application_one) { create(:job_application, job: job) }
+    let(:job_application_two) { create(:job_application, job: job) }
+    let(:job_application_three) { create(:job_application, job: job) }
+
+    it "bulk updates job applications" do
+      id_params = [job_application_one.id, job_application_two.id, job_application_three.id]
+
+      send_request :patch, bulk_update_status_api_v1_job_applications_path(job_id: job.id),
+        headers: auth_headers(user),
+        params: { job_application: { ids: id_params, status: "rejected" } }.to_json
+
+      expect(job_application_one.reload.status).to eql("rejected")
+    end
+
+    it "not update when wrong status" do
+      id_params = [job_application_one.id, job_application_two.id]
+
+      send_request :patch, bulk_update_status_api_v1_job_applications_path(job_id: job.id),
+        headers: auth_headers(user),
+        params: { job_application: { ids: id_params, status: "accepted" } }.to_json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json_response["errors"]).to include("invalid status")
     end
   end
 

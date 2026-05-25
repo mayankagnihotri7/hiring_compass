@@ -5,8 +5,8 @@ module Api
     class JobApplicationsController < ApplicationController
       include RateLimitable
 
-      before_action :authenticate_user!, only: %i[index update]
-      before_action :set_job, only: %i[index create show update download]
+      before_action :authenticate_user!, only: %i[index update download bulk_update_status]
+      before_action :set_job, only: %i[index create show update download bulk_update_status]
       before_action :set_job_application, only: %i[show update download]
 
       rate_limit_create to: 15, within: 1.minute
@@ -80,6 +80,30 @@ module Api
         render json: { errors: "Too many attempts. Please try again later." }, status: :too_many_requests
       end
 
+      def bulk_update_status
+        status = ids_params[:status]
+
+        unless JobApplication.statuses.key?(status)
+          return render json: { errors: "invalid status" }, status: :unprocessable_content
+        end
+
+        ids = ids_params[:ids]
+        job_applications = policy_scope(JobApplication)
+
+        ActiveRecord::Base.transaction do
+          found = job_applications.where(id: ids)
+          found.update_all(status: status)
+
+          BulkStatusUpdateJob.perform_async(found.pluck(:id))
+
+          render json: { message: "Job Applications updated." }, status: :ok
+        end
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.message }, status: :unprocessable_content
+      rescue => e
+        render json: { errors: "Something went wrong." }, status: :internal_server_error
+      end
+
       private
 
         def job_application_params
@@ -91,6 +115,10 @@ module Api
 
         def update_params
           params.require(:job_application).permit(:status)
+        end
+
+        def ids_params
+          params.require(:job_application).permit(:status, ids: [])
         end
 
         def set_job
