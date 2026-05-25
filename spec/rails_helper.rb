@@ -12,6 +12,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "rspec/rails"
 Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
 
+require "sidekiq/testing"
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
@@ -77,6 +79,9 @@ RSpec.configure do |config|
   #
   # To enable this behaviour uncomment the line below.
   # config.infer_spec_type_from_file_location!
+  config.before(:each) do
+    Sidekiq::Worker.clear_all
+  end
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
