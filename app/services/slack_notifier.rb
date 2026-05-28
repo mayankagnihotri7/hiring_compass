@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "net/http"
+
 class SlackNotifier
   def self.notify(webhook_url, message)
     return if webhook_url.blank?

@@ -26,7 +26,7 @@ module Api
 
           SlackNotificationJob.perform_async(
             ENV["SLACK_WEBHOOK_URL"],
-            "Application from #{job_application.full_name} has been #{job_application.status}"
+            "Application for #{job_application.full_name} has been changed to #{job_application.status}"
           )
 
           render json: job_application
