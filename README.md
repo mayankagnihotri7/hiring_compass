@@ -177,7 +177,7 @@ PUT /api/v1/jobs/:job_id/job_applications/:id
 ### Bulk update application status (authentication required)
 PATCH /api/v1/jobs/:job_id/job_applications/bulk_update_status
 
-Update multiple job applications for a job in a single request. Only applications belonging to teh specified job are updated. Invalid IDs are silently skipped.
+Update multiple job applications for a job in a single request. Only job applications belonging to tech specified job are updated. Invalid IDs are silently skipped.
 
 **Request body**
 ```json
