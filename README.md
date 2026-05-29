@@ -45,6 +45,12 @@ bundle install
 # Setup database
 rails db:create db:migrate db:seed
 
+# Start Redis (must be running before the server)
+redis-server
+
+# Start Sidekiq (in a separate terminal tab/window)
+bundle exec sidekiq
+
 # Start the server
 rails s
 ```
