@@ -12,6 +12,9 @@ A RESTful API for a job board platform where recruiters can post jobs and applic
 - **Rate Limiting** - Protection against spam.
 - **Resume Upload** - Active storage for resume attachments.
 - **Application Tracking** - Status updates - (pending, reviewed, shortlisted, rejected, hired).
+- **Slack Notifications** - Notify your Slack channel when job application status changes.
+- **OTP Verification** - Email based OTP to verify applicants before submission with cooldown and rate limiting.
+- **Bulk Status Update** - Update multiple job application statuses at once.
 
 ## Tech Stack
 - Ruby on rails 7.2 (API only).
@@ -20,12 +23,15 @@ A RESTful API for a job board platform where recruiters can post jobs and applic
 - ActionMailer for emails.
 - Pundit for authorization.
 - Devise and Devise token auth.
+- Redis for OTP caching and Sidekiq.
+- Sidekiq for background jobs.
 
 ## Getting Started
 ## Prerequisites
 - Ruby 3.2.2
 - PostgreSQL
 - Node.js (for ActiveStorage)
+- Redis
 
 ## Installation
 ```bash
@@ -39,10 +45,26 @@ bundle install
 # Setup database
 rails db:create db:migrate db:seed
 
+# Start Redis (must be running before the server)
+redis-server
+
+# Start Sidekiq (in a separate terminal tab/window)
+bundle exec sidekiq
+
 # Start the server
 rails s
 ```
 The API will be available at `http://localhost:3000`
+
+## Environment Variables
+
+Create a `.env` file in the directory:
+
+```
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxx/yyy/zzz
+```
+
+`SLACK_WEBHOOK_URL` is optional. If not set, Slack notifications are silently skipped.
 
 ## API Documentation
 ## Authentication
@@ -121,11 +143,16 @@ GET /api/v1/technologies
 
 ### Job Application
 
+### Request OTP (no authentication required)
+POST /api/v1/jobs/:job_id/job_applications/send_otp
+
+An OTP is sent to the applicant's email before submission. The OTP is valid for 15 minutes. Requests are rate limited to 3 sends per 15 minutes per email with 60 second cooldown between sends.
+
 ### List applications for a job (requires authentication)
 GET /api/v1/jobs/:job_id/job_applications
 
 ### Apply to a job (no authentication required)
-POST /api/v1/jobs/:job_id/applications
+POST /api/v1/jobs/:job_id/job_applications
 
 **Request (multipart/form-data):**
 ```
@@ -153,6 +180,28 @@ PUT /api/v1/jobs/:job_id/job_applications/:id
 
 **Available statuses:** `pending`, `reviewed`, `shortlisted`, `rejected`, `hired`, `withdrawn`.
 
+### Bulk update application status (authentication required)
+PATCH /api/v1/jobs/:job_id/job_applications/bulk_update_status
+
+Update multiple job applications for a job in a single request. Only job applications belonging to tech specified job are updated. Invalid IDs are silently skipped.
+
+**Request body**
+```json
+{
+  "job_application": {
+    "ids": [1, 2, 3],
+    "status": "rejected"
+  }
+}
+```
+
+**Response**
+```json
+{
+  "message": "Job Applications updated."
+}
+```
+
 ### Download resume (requires authentication)
 GET /api/v1/:job_id/job_applications/:id/download
 
@@ -168,8 +217,14 @@ Applicants receive emails when:
 - Anyone can view open jobs and apply.
 
 ## Rate Limiting
-- API requests are rate limited to prevent abouse.
+- API requests are rate limited to prevent abuse.
 - Limits vary by endpoint.
+- OTP requests are limited to 3 sends per 15 minutes per email with a 60 second cooldown.
+
+## Slack Notifications
+- When a job application status is updated, a notification is sent to your configured Slack channel.
+- Set `SLACK_WEBHOOK_URL` in `.env` to enable this.
+- To get a webhook URL, go to `Apps -> Incoming Webhooks -> Add to Slack` in your Slack workspace, pick a channel and copy the webhook URL.
 
 ## Development
 
