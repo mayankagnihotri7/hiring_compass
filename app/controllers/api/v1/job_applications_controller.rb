@@ -24,6 +24,11 @@ module Api
         if job_application.save
           JobApplicationMailer.application_received(job_application).deliver_later
 
+          SlackNotificationJob.perform_async(
+            ENV["SLACK_WEBHOOK_URL"],
+            "Application for #{job_application.full_name} has been changed to #{job_application.status}"
+          )
+
           render json: job_application
         else
           render json: { errors: job_application.errors.full_messages }, status: :unprocessable_content
