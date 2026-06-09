@@ -56,6 +56,17 @@ rails s
 ```
 The API will be available at `http://localhost:3000`
 
+## Docker Setup (Alternative)
+If you prefer Docker, you can spin up the entire stack with a single command.
+
+```bash
+git clone https://github.com/mayankagnihotri7/hiring_compass.git
+cd hiring-compass
+cp .env.example .env
+docker compose up
+```
+This starts Rails, PostgreSQL, Redis and Sidekiq together. The API will be available at `http://localhost:3000`
+
 ## Environment Variables
 
 Create a `.env` file in the directory:
