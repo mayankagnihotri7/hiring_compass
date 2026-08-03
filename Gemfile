@@ -50,7 +50,7 @@ group :development, :test do
 end
 
 gem "connection_pool", "~> 2.4"
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 gem "devise_token_auth"
 gem "phonelib"
 gem "pundit", "~> 2.5"
